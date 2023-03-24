@@ -24,8 +24,9 @@
   visibility: hidden;
 }
         canvas {
-            background:rgb(150,150,150);
+            background:rgba(83, 197, 250, 0.986);
             position:absolute;
+            border-radius: 10px;
             top:0;
             bottom: 0;
             left: 0;
@@ -39,6 +40,7 @@
           appearance: none;
           -moz-appearance: none;
           -webkit-appearance: none;
+          
           height: 30px;
           width: 200px;
           left: 50%;
@@ -48,25 +50,29 @@
           position: fixed;     /* Fixed is better */
 
         }
-
+.roundedcorners{
+  border-radius: 10px;
+}
 .answerbtn{
  margin-top: 200px;
 }
     </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   </head>
 
   <body>
     
     <canvas id="mainCanvas" width="800" height="600">No canvas support</canvas>
-    <div class="subdivs" id="ldiv" style="left: 30%;" >
-      <img id="limg" style="width: 200px; height: 200px;" >
-    </div><div id="rdiv" class="subdivs" style="left: 55%;">
-      <img id="rimg" style="width: 200px; height: 200px;" >
+    <div class="subdivs " id="ldiv" style="left: 30%;" >
+      <img id="limg" class="roundedcorners" style="width: 200px; height: 200px;" >
+    </div><div id="rdiv" class="subdivs " style="left: 55%;">
+      <img id="rimg" class="roundedcorners" style="width: 200px; height: 200px;" >
     </div>
-    <div id="imgdiv" ><img style="width: 200px; height: 200px;" src="images/1.jpeg"></div>
-    <button id="exp_button"  onclick="startExperiment()">Start Experiment</button>
+    <div id="imgdiv" class="roundedcorners" ><img class="roundedcorners" style="width: 200px; height: 200px;" src="images/1.jpeg"></div>
+    <button id="exp_button" class="btn btn-outline-success" onclick="startExperiment()">Start Experiment</button>
     
     <textarea id = "outputData" style="position: absolute; " rows="30"></textarea>
     <button  class="answerbtn" style="left: 43%; top: 60%; visibility: hidden; position: absolute; background-color: inherit"  id="left" onclick="answer('left')"><img style="width: 40px;height:20px;" src="images/leftarrow.jpeg"></button>
@@ -179,8 +185,8 @@ stages=1;
         // Button is Here
 
         ctx.fillText('',xCenter,380);
-        ctx.fillText('If the target is GREEN respond with the L key',xCenter,430);
-        ctx.fillText('If the tsrget is RED respond with the R key',xCenter,480);
+        ctx.fillText('If the target is on the left respond with the left arrow',xCenter,430);
+        ctx.fillText('If the target is on the right respond with right arrow',xCenter,480);
         ctx.fillText('To start the experiment just click the button',xCenter,530);
         ctx.textAlign = 'left';
 expnum=1;
