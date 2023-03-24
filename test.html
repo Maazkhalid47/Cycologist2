@@ -72,17 +72,18 @@
       <img id="rimg" class="roundedcorners" style="width: 200px; height: 200px;" >
     </div>
     <div id="imgdiv" class="roundedcorners" ><img class="roundedcorners" style="width: 200px; height: 200px;" src="images/1.jpeg"></div>
-    <button id="exp_button" class="btn btn-outline-success" onclick="startExperiment()">Start Experiment</button>
+    <button id="exp_button" style=" color: rgb(14, 13, 13);  border-radius: 15px; "  class=" btn btn-outline-light btn-lg" onclick="startExperiment()">Start Experiment</button>
     
-    <textarea id = "outputData" style="position: absolute; " rows="30"></textarea>
+    <textarea id = "outputData" style="margin-top: 100px; text-align: left; font-size: 10px;" rows="30" cols="50">Exp     Trial    Correct respond   Given resp     Response Time</textarea>
     <button  class="answerbtn" style="left: 43%; top: 60%; visibility: hidden; position: absolute; background-color: inherit"  id="left" onclick="answer('left')"><img style="width: 40px;height:20px;" src="images/leftarrow.jpeg"></button>
     <button class="answerbtn"  style="left: 53%; top: 60%; visibility: hidden; position: absolute; background-color: inherit" id="right" onclick="answer('right')"><img style="width: 40px;height:20px;" src="images/rightarrow.jpg"></button>
     <button class="stage2" id="stage2" onclick="stage2()" style="position: absolute; left: 45%; top: 90%; visibility: hidden;">Proceed to Stage 2</button>
     <button class="startagain" id="startagain" onclick="startagain()" style="position: absolute; left: 45%; top: 90%; visibility: hidden;">Proceed stage one again</button>
-    <button class="btn btn-primary" id="copyID" style="margin-left: 180px;">
+    <br>
+    <button class="btn btn-primary btn-lg" id="copyID">
       <i class="fa fa-copy"></i>
     </button>
-    <button class="btn btn-primary" id="downloadbutton" style="margin-left: 5x;">
+    <button class="btn btn-primary btn-lg" id="downloadbutton">
       <i class="fa fa-download"></i>
     </button>
    <script>
@@ -542,11 +543,11 @@ if (trialNum>=numTrials) {
           trialData = [];
           if(trialNum<=10){
           trialData.push(expnum);
-          trialData.push(+trialNum);
+          trialData.push("        "+trialNum);
           
-          trialData.push(responseKey);
-          trialData.push(reply);
-          trialData.push(trialRT);
+          trialData.push("        "+responseKey);
+          trialData.push("                        "+reply);
+          trialData.push("               "+trialRT);
           
           console.log(trialData);
           }
@@ -556,7 +557,7 @@ if (trialNum>=numTrials) {
         // Store trial data on webpage
         if(trialNum<=10){
         var currentData = document.getElementById('outputData').value;
-        var newData = trialData.toString() + "\n";
+        var newData ="\n"+ trialData.toString();
         document.getElementById('outputData').value = currentData+newData;
         }
       }
