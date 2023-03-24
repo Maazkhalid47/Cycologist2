@@ -1,0 +1,613 @@
+<html>
+
+  <head>
+
+    <style>
+#imgdiv{
+  width: 200px;
+  height: 200px;
+  position: absolute;
+    top: 50%;
+    left: 45%;
+    margin-top: -50px;
+    margin-left: -50px;
+    visibility: hidden;
+    
+}
+.subdivs{
+  width: 200px;
+  height: 200px;
+  position: absolute;
+    top: 50%;
+  margin-top: -50px;
+  /* background-color: aqua; */
+  visibility: hidden;
+}
+        canvas {
+            background:rgb(150,150,150);
+            position:absolute;
+            top:0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin:auto;
+            font-family: "Times New Roman", Times, serif;
+        }
+
+        /* Style the button */
+        #exp_button {
+          appearance: none;
+          -moz-appearance: none;
+          -webkit-appearance: none;
+          height: 30px;
+          width: 200px;
+          left: 50%;
+          top: 50%;
+          margin-top: -15px;   /* = -height / 2   */
+          margin-left: -100px; /* = -width / 2    */
+          position: fixed;     /* Fixed is better */
+
+        }
+
+.answerbtn{
+ margin-top: 200px;
+}
+    </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  </head>
+
+  <body>
+    
+    <canvas id="mainCanvas" width="800" height="600">No canvas support</canvas>
+    <div class="subdivs" id="ldiv" style="left: 30%;" >
+      <img id="limg" style="width: 200px; height: 200px;" >
+    </div><div id="rdiv" class="subdivs" style="left: 55%;">
+      <img id="rimg" style="width: 200px; height: 200px;" >
+    </div>
+    <div id="imgdiv" ><img style="width: 200px; height: 200px;" src="images/1.jpeg"></div>
+    <button id="exp_button"  onclick="startExperiment()">Start Experiment</button>
+    
+    <textarea id = "outputData" style="position: absolute; " rows="30"></textarea>
+    <button  class="answerbtn" style="left: 43%; top: 60%; visibility: hidden; position: absolute; background-color: inherit"  id="left" onclick="answer('left')"><img style="width: 40px;height:20px;" src="images/leftarrow.jpeg"></button>
+    <button class="answerbtn"  style="left: 53%; top: 60%; visibility: hidden; position: absolute; background-color: inherit" id="right" onclick="answer('right')"><img style="width: 40px;height:20px;" src="images/rightarrow.jpg"></button>
+    <button class="stage2" id="stage2" onclick="stage2()" style="position: absolute; left: 45%; top: 90%; visibility: hidden;">Proceed to Stage 2</button>
+    <button class="startagain" id="startagain" onclick="startagain()" style="position: absolute; left: 45%; top: 90%; visibility: hidden;">Proceed stage one again</button>
+    <button class="btn btn-primary" id="copyID" style="margin-left: 180px;">
+      <i class="fa fa-copy"></i>
+    </button>
+    <button class="btn btn-primary" id="downloadbutton" style="margin-left: 5x;">
+      <i class="fa fa-download"></i>
+    </button>
+   <script>
+    var expnum=0;
+      var myCanvas = document.getElementById("mainCanvas");
+      var targetdiv=document.getElementById("imgdiv");
+      var ctx = myCanvas.getContext("2d");
+      var xCenter = myCanvas.width/2;
+      var yCenter = myCanvas.height/2;
+var guess;
+      // Set the size and initial location of the object
+      var targetSize = 200;
+      var targetX = xCenter-targetSize/2;
+      var targetY = yCenter-targetSize/2;
+var reply;
+      // Keyboard and timing variables
+      var waitingForResponse=false;
+      var keyAlreadyDown = false;
+      var timeoutID;
+
+      var trialNum = 0;
+      var numTrials = 10;
+
+      // Color codes for the screen
+      var redTarget = "rgb(200,0,0)";
+      var greenTarget ="rgb(0,200,0)";
+      var targetColor = redTarget;
+var bugger=0;
+      //Keys assigned to red and green responses
+      var right = 'r';
+      var left = 'l';
+var otherImage;
+var otherImage2;
+      var responseKey;
+      var correctResponse;
+      var thisColor;
+var stages=1;
+      var startTimer, stopTimer;
+      var trialRT;
+      var trialData =[];
+      var targetImages = ["images/1.jpeg","images/1.jpeg","images/1.jpeg","images/1.jpeg","images/1.jpeg"];
+      var otherimages = ["images/7.jpeg", "images/8.jpeg", "images/9.jpeg", "images/10.jpeg" , "images/11.jpeg","images/7.jpeg", "images/8.jpeg", "images/9.jpeg", "images/10.jpeg" , "images/11.jpeg"];
+      var otheranimals = ["images/2.jpeg","images/3.jpeg","images/4.jpeg","images/5.jpeg","images/6.jpeg","images/2.jpeg","images/3.jpeg","images/4.jpeg","images/5.jpeg","images/6.jpeg"];
+var bulb=0;
+      
+
+      // Tell the web browser to listen for input events
+      document.addEventListener("keydown", keyDownHandler, false);
+      document.addEventListener("keyup", keyUpHandler, false);
+      
+      function stage2(){
+        
+        stages=2;
+        reset();
+        startExperiment2();
+      }
+   function startagain(){
+    ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+stages=1;
+
+    openingText();
+   }   
+      function keyDownHandler(e) {
+
+        if (!keyAlreadyDown) {
+          
+
+          keyAlreadyDown = true;
+
+          if (waitingForResponse) {
+            // console.log(e);
+            if (e.key == right || e.key == left) {
+              waitingForResponse = false;
+              if (e.key == right) {
+                responseKey = "right";
+              } else {
+                responseKey = "left";
+              }
+              endTrial();
+            }
+          }
+        }
+
+      }
+
+      function keyUpHandler(e) {
+        keyAlreadyDown = false;
+      }
+
+      function openingText() {
+        ctx.font = '48px "Times New Roman"';
+        ctx.textAlign = 'center';
+        ctx.fillText('Simple Experiment Example 1.0',xCenter,50);
+        ctx.font = '24px "Times New Roman"';
+        ctx.fillText('This code shows how to structure a simple experiment',xCenter,120);
+        ctx.fillText('Here we can write some basic instructions',xCenter,170);
+        ctx.fillText('The experiment compares two images',xCenter,220);
+        document.getElementById('exp_button').style.visibility = 'visible';
+        document.getElementById('startagain').style.visibility = 'hidden';
+        // Button is Here
+
+        ctx.fillText('',xCenter,380);
+        ctx.fillText('If the target is GREEN respond with the L key',xCenter,430);
+        ctx.fillText('If the tsrget is RED respond with the R key',xCenter,480);
+        ctx.fillText('To start the experiment just click the button',xCenter,530);
+        ctx.textAlign = 'left';
+expnum=1;
+stages=1;
+      }
+     
+function reset(){
+  trialNum=0;
+         reply, timeoutID ,responseKey, correctResponse, startTimer ,stopTimer, trialRT="";
+        
+}
+      function closingText2() {
+        bulb=1;
+        reset();
+stages=1;
+        // ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+        
+  setTimeout(() => {
+let get = document.getElementById('ldiv');
+get.style.visibility = 'hidden';
+}, 0000);
+setTimeout(() => {
+let get = document.getElementById('rdiv');
+get.style.visibility = 'hidden';
+}, 0000);
+
+        ctx.font = '48px "Times New Roman"';
+         ctx.fillStyle = "black";
+        ctx.textAlign = 'center';
+        ctx.fillText('Simple Experiment Example 2.0',xCenter,50);
+        ctx.font = '24px "Times New Roman"';
+        ctx.fillText('Thank you for completing the experiment.',xCenter,220);
+        ctx.fillText('You may now close the browser window',xCenter,400);
+        // ctx.fillText('Click the button to be download your data...',xCenter,450);
+        document.getElementById('left').style.visibility = 'hidden';
+        document.getElementById('right').style.visibility = 'hidden';
+        document.getElementById('startagain').style.visibility = 'visible';
+        bugger=1;
+      }
+      
+    
+      function closingText() {
+
+ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+
+ctx.font = '48px "Times New Roman"';
+ctx.fillStyle = "black";
+ctx.textAlign = 'center';
+ctx.fillText('Simple Experiment Example 1.0',xCenter,50);
+ctx.font = '24px "Times New Roman"';
+ctx.fillText('Thank you for completing the experiment.',xCenter,220);
+ctx.fillText('You may now close the browser window or proceed to stage 2',xCenter,400);
+// ctx.fillText('Click the button to be download your data...',xCenter,450);
+document.getElementById('left').style.visibility = 'hidden';
+document.getElementById('right').style.visibility = 'hidden';
+document.getElementById('stage2').style.visibility = 'visible';
+
+}
+
+      function startExperiment() {
+        expnum=1;
+        document.getElementById('exp_button').style.visibility = 'hidden';
+        // document.getElementById('mainCanvas').style.cursor = 'none';// set cursor visibility
+        
+        console.log("Hello Ivan!!!");
+
+        bugger=0;
+        timeoutID = setTimeout(drawFixation, 550);///////pehele trial se pehele wala +
+showTrial();
+bulb=0;
+      }
+
+      function startExperiment2() {
+        alert("start exp 2")
+        trialNum=0;
+        expnum=2;
+        document.getElementById('exp_button').style.visibility = 'hidden';
+        // document.getElementById('mainCanvas').style.cursor = 'none'; //set cursor visibility
+        document.getElementById('left').style.visibility = 'hidden';
+        document.getElementById('right').style.visibility = 'hidden';
+        document.getElementById('stage2').style.visibility = 'hidden';
+        console.log("Hello Ivan!!!");
+
+        
+        timeoutID = setTimeout(drawFixation, 500);
+showTrial2();
+      }
+ function showTrial(){///////////////////////////
+  
+  setTimeout(() => {
+let get = document.getElementById('imgdiv');
+get.style.visibility = 'visible';
+}, 550);
+ // targetdiv.style.visibility='visible';
+        setTimeout(() => {
+           let get = document.getElementById('imgdiv');
+            get.style.visibility = 'hidden';
+}, 2500);
+
+
+ showtest();
+
+}
+function showTrial2(){///////////////////////////
+  
+  setTimeout(() => {
+let get = document.getElementById('imgdiv');
+get.style.visibility = 'visible';
+}, 500);
+ // targetdiv.style.visibility='visible';
+        setTimeout(() => {
+           let get = document.getElementById('imgdiv');
+            get.style.visibility = 'hidden';
+}, 2500);
+
+
+ showtest2();
+
+}
+
+
+function showtest(){////////////////////
+  
+  if(trialNum<  numTrials){
+  setTimeout(() => {
+let get = document.getElementById('ldiv');
+get.style.visibility = 'visible';
+}, 3100);
+setTimeout(() => {
+let get = document.getElementById('rdiv');
+get.style.visibility = 'visible';
+}, 3100);
+setimages();
+}else{
+  setTimeout(() => {
+let get = document.getElementById('ldiv');
+get.style.visibility = 'hidden';
+}, 0000);
+setTimeout(() => {
+let get = document.getElementById('rdiv');
+get.style.visibility = 'hidden';
+}, 0000);
+}
+}
+function showtest2(){////////////////////
+  if(bulb==0){
+  if(trialNum<  10){
+  setTimeout(() => {
+let get = document.getElementById('ldiv');
+get.style.visibility = 'visible';
+}, 3100);
+setTimeout(() => {
+let get = document.getElementById('rdiv');
+get.style.visibility = 'visible';
+}, 3100);
+setimages2();
+}else{
+  setTimeout(() => {
+let get = document.getElementById('ldiv');
+get.style.visibility = 'hidden';
+}, 0000);
+setTimeout(() => {
+let get = document.getElementById('rdiv');
+get.style.visibility = 'hidden';
+}, 0000);
+}}
+}
+
+
+function setimages(){//////////////////////////
+  
+var imgindex = Math.floor(Math.random() * otherimages.length);
+otherImage = otherimages[imgindex];
+
+if(imgindex > 5){
+  document.getElementById("limg").src = otherImage;
+  document.getElementById("rimg").src =  targetImages[0];
+  correctResponse="right";
+
+}else{document.getElementById("rimg").src = otherImage;
+document.getElementById("limg").src =  targetImages[0];
+correctResponse="left";
+
+}
+
+for(x=0;x<=otherimages.length;x++){
+waitingForResponse=true;
+}
+startTimer =Math.floor( performance.now());
+
+}
+function setimages2(){//////////////////////////
+  var imgindex2 = Math.floor(Math.random() * otheranimals.length);
+  otherImage2 = otheranimals[imgindex2];
+  
+  if(imgindex2 > 5){
+    document.getElementById("limg").src = otherImage2;
+    document.getElementById("rimg").src =  targetImages[0];
+    correctResponse="right";
+  
+  }else{document.getElementById("rimg").src = otherImage2;
+  document.getElementById("limg").src =  targetImages[0];
+  correctResponse="left";
+  
+  }
+  
+  for(x=0;x<=10;x++){
+  waitingForResponse=true;
+  }
+  startTimer=Math.floor( performance.now());
+ 
+  }
+
+
+  function answer(side){/////////////////////////////////////////
+    
+    trialNum++;
+  setTimeout(() => {
+let get = document.getElementById('ldiv');
+get.style.visibility = 'hidden';
+}, 0000);
+setTimeout(() => {
+let get = document.getElementById('rdiv');
+get.style.visibility = 'hidden';
+}, 0000);
+      responseKey =side;
+      for(x=0;x<=9;x++){
+  if(x<10){
+if(waitingForResponse){
+waitingForResponse=false;
+if(responseKey==correctResponse){
+  reply=true;
+}else{
+  reply=false;
+}
+}
+if(stages==1  ){timeoutID=setTimeout(showtest,500);}else{timeoutID=setTimeout(showtest2,500);}
+
+}
+}
+
+endTrial();
+    
+}
+     
+function newTrial() {//////////+++++++++
+
+        clearTimeout(timeoutID);
+ timeoutID = setTimeout(drawFixation, 100);
+
+      }
+
+      function drawFixation() {
+
+        clearTimeout(timeoutID);
+
+        ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+
+        ctx.font = '36px "Times New Roman"';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = "black";
+
+
+        ctx.fillText("+",xCenter,yCenter);
+
+        drawHeader1();
+        drawHeader2();
+
+        // draw target and wait for keyboard response
+        timeoutID = setTimeout(draw, 2500);///firstclick k baad wala +
+
+      }
+
+      function giveFeedback() {
+
+        ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+
+        ctx.font = '36px "Times New Roman"';
+      
+        ctx.fillStyle = "black";
+        
+
+
+
+        if (reply) {
+          ctx.fillText("Correct with RT = " + trialRT + " ms",xCenter,yCenter);
+        } else {
+          ctx.fillText("Error with RT = " + trialRT + " ms",xCenter,yCenter);
+        }
+
+        drawHeader1();
+        drawHeader2();
+
+        timeoutID = setTimeout(newTrial, 1000);
+
+      }
+
+      function drawHeader1() {
+          ctx.font = "16px Arial";
+          ctx.fillStyle = "rgb(200,0,0)";
+          ctx.fillText("Exp:"+expnum, 30, 20);
+      }
+
+      function drawHeader2() {
+          ctx.font = "16px Arial";
+          ctx.fillStyle = "rgb(200,0,0)";
+          ctx.fillText("Trial: "+(trialNum), myCanvas.width-65, 20);
+      }
+
+      function drawStim() {
+        ctx.fillStyle = targetColor;
+        ctx.fillRect(targetX,targetY ,targetSize,targetSize);
+        
+        waitingForResponse = true;
+      }
+
+      function draw() {
+        clearTimeout(timeoutID);
+        ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+        drawHeader1();
+        drawHeader2();
+        // drawStim();
+      }
+
+  
+      function endTrial() {
+
+ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+
+// correctResponse = (correctResponse == responseKey);
+trialRT=Math.floor((stopTimer-startTimer)-3000);
+
+pushData();
+writeLocal();
+
+if (trialNum>=numTrials) {
+  if(stages==1){
+    closingText();
+  }else{
+    closingText2();
+  }
+  
+  
+} else {
+  giveFeedback();
+}
+
+}
+
+
+      function pushData() {
+        // Collect all relevant trial data ready for sending
+          trialData = [];
+          if(trialNum<=10){
+          trialData.push(expnum);
+          trialData.push(+trialNum);
+          
+          trialData.push(responseKey);
+          trialData.push(reply);
+          trialData.push(trialRT);
+          
+          console.log(trialData);
+          }
+      }
+
+      function writeLocal() {
+        // Store trial data on webpage
+        if(trialNum<=10){
+        var currentData = document.getElementById('outputData').value;
+        var newData = trialData.toString() + "\n";
+        document.getElementById('outputData').value = currentData+newData;
+        }
+      }
+
+     openingText();
+//////////////***********************************
+var button = document.getElementById("copyID"),
+        input = document.getElementById("outputData");
+      button.addEventListener("click", function(event) {
+        event.preventDefault();
+        input.select();
+        document.execCommand("copy");
+      });
+      // Start file download.
+      document.getElementById("downloadbutton").addEventListener("click", function() {
+        // Generate download of hello.txt
+        // file with some content
+        var text = document.getElementById("outputData").value;
+        var filename = "searchAnalysis.txt";
+        download(filename, text);
+      }, false);
+
+      function download(file, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8, ' + encodeURIComponent(text));
+        element.setAttribute('download', file);
+        document.body.appendChild(element);
+        //onClick property
+        element.click();
+        document.body.removeChild(element);
+      }
+    ////////////////////********************************************
+   
+    document.onkeydown = function(event) {
+      
+        switch (event.keyCode) {
+            case 37:
+              if(bugger==0){stopTimer = Math.floor(performance.now());
+            answer('left');}else{alert("trials finished")}
+            
+            break;
+            
+            case 39:
+            if(bugger==0 ){stopTimer = Math.floor(performance.now());
+            answer('right');}else{alert("trials finished")}
+            
+            break;
+          
+            default:
+              alert("please use the arrow keys to choose either left or right");
+         }
+        }
+         
+      
+    
+    </script>
+
+  </body>
+
+</html>
